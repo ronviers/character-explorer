@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.venv/
+venv/
+
+# host profiler output — may carry environment fingerprints; never commit
+dev_profile.json
+
+# ad-hoc scene emissions (the committed sample scene lives in fixtures/)
+/scene.json
+/demo/scene.json
+*.local.json

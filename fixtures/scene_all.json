@@ -1,0 +1,1083 @@
+{
+  "meta": {
+    "title": "Character \u2014 finite-drive structure in driven-dissipative steady states",
+    "framing": [
+      {
+        "kind": "disclaimer",
+        "text": "illustration, not evidence \u2014 every quantity is built in"
+      },
+      {
+        "kind": "note",
+        "text": "the FDR view is estimator calibration, not a \u03b2-collapse test"
+      },
+      {
+        "kind": "note",
+        "text": "observables live in the open interior; edges are approached, never evaluated"
+      }
+    ],
+    "mode_default": "guided",
+    "modes": [
+      "guided",
+      "open"
+    ],
+    "guided": [
+      {
+        "id": "q1",
+        "title": "Where does the flow come from?",
+        "prompt": "Turn the drive down to 0 \u2014 watch the circulation vanish. Then ask: why isn't two nodes enough?",
+        "view": "minting.graph",
+        "axis": "drive"
+      },
+      {
+        "id": "q2",
+        "title": "Stored or sustained?",
+        "prompt": "Scrub time past the ramp. The current decays to ~0 \u2014 it was never stored, only sustained by the drive.",
+        "view": "drive.relax",
+        "axis": "time"
+      },
+      {
+        "id": "q3",
+        "title": "Why do two measurements agree?",
+        "prompt": "The heat you'd measure and the current-times-affinity are the same number \u2014 one dissipation, two ledgers.",
+        "view": "ledgers.sigma"
+      },
+      {
+        "id": "q4",
+        "title": "What happens at the extreme?",
+        "prompt": "Scrub \u03b5 toward 1. The cost blows up and the gap closes \u2014 and the apparatus refuses to read a value AT \u03b5=1. Character lives in the open interior.",
+        "view": "boundary.eps",
+        "axis": "toward_edge"
+      },
+      {
+        "id": "q5",
+        "title": "How does complexity build up?",
+        "prompt": "Add levels. Structure climbs the protected subspace; its cost is paid downward as hidden dissipation. Past \u03b5\u21921 the tower stops converging.",
+        "view": "cascade.tower",
+        "axis": "depth"
+      }
+    ]
+  },
+  "axes": [
+    {
+      "name": "drive",
+      "label": "how hard is it driven?",
+      "values": [
+        0.0,
+        0.1,
+        0.3,
+        0.6,
+        1.0
+      ]
+    },
+    {
+      "name": "time",
+      "label": "watch over time (drive ramps off)",
+      "values": [
+        0.0,
+        0.08,
+        0.16,
+        0.24,
+        0.32,
+        0.4,
+        0.48,
+        0.56,
+        0.64,
+        0.72,
+        0.8,
+        0.88,
+        0.96,
+        1.04,
+        1.12,
+        1.2,
+        1.28,
+        1.36,
+        1.44,
+        1.52,
+        1.6,
+        1.68,
+        1.76,
+        1.84,
+        1.92,
+        2.0,
+        2.08,
+        2.16,
+        2.24,
+        2.32,
+        2.4,
+        2.48,
+        2.56,
+        2.64,
+        2.72,
+        2.8,
+        2.88,
+        2.96,
+        3.04,
+        3.12,
+        3.2,
+        3.28,
+        3.36,
+        3.44,
+        3.52,
+        3.6,
+        3.68,
+        3.76,
+        3.84,
+        3.92,
+        4.0,
+        4.08,
+        4.16,
+        4.24,
+        4.32,
+        4.4,
+        4.48,
+        4.56,
+        4.64,
+        4.72,
+        4.8,
+        4.88,
+        4.96,
+        5.04,
+        5.12,
+        5.2,
+        5.28,
+        5.36,
+        5.44,
+        5.52,
+        5.6,
+        5.68,
+        5.76,
+        5.84,
+        5.92,
+        6.0,
+        6.08,
+        6.16,
+        6.24,
+        6.32,
+        6.4,
+        6.48,
+        6.56,
+        6.64,
+        6.72,
+        6.8,
+        6.88,
+        6.96,
+        7.04,
+        7.12,
+        7.2,
+        7.28,
+        7.36,
+        7.44,
+        7.52,
+        7.6,
+        7.68,
+        7.76,
+        7.84,
+        7.92
+      ]
+    },
+    {
+      "name": "toward_edge",
+      "label": "push toward the edge (\u03b5 \u2192 1)",
+      "values": [
+        0.5,
+        0.8,
+        0.9,
+        0.95,
+        0.99
+      ]
+    },
+    {
+      "name": "depth",
+      "label": "stack the hierarchy (cascade depth)",
+      "values": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "views": [
+    {
+      "kind": "graph",
+      "id": "minting.graph",
+      "title": "the coupling loop",
+      "data": {
+        "nodes": [
+          0,
+          1,
+          2
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1,
+            "sign": 1,
+            "reciprocal": false
+          },
+          {
+            "from": 1,
+            "to": 2,
+            "sign": 1,
+            "reciprocal": false
+          },
+          {
+            "from": 2,
+            "to": 0,
+            "sign": 1,
+            "reciprocal": false
+          }
+        ],
+        "layout": [
+          [
+            1.0,
+            0.0
+          ],
+          [
+            -0.4999999999999998,
+            0.8660254037844387
+          ],
+          [
+            -0.5000000000000004,
+            -0.8660254037844385
+          ]
+        ],
+        "circulation": {
+          "values": [
+            0.0,
+            2.1766,
+            6.5297,
+            13.0594,
+            21.7656
+          ],
+          "over": [
+            "drive"
+          ],
+          "unit": "nats/cycle",
+          "verdict": "analytic",
+          "role": "primary",
+          "label": "circulation \ud835\udc9c"
+        }
+      },
+      "explain": "three modes in a frustrated cycle; the circulating current is the minted bit"
+    },
+    {
+      "kind": "spectrum",
+      "id": "minting.spectrum",
+      "title": "Jacobian eigenvalues",
+      "data": {
+        "before": [
+          [
+            -1.0,
+            0.0
+          ],
+          [
+            -1.0,
+            0.0
+          ],
+          [
+            -1.0,
+            0.0
+          ]
+        ],
+        "after": [
+          [
+            -1.0,
+            1.732
+          ],
+          [
+            -1.0,
+            -1.732
+          ],
+          [
+            -1.0,
+            0.0
+          ]
+        ]
+      },
+      "explain": "a complex pair appears when the loop is driven -- the onset signature, not the invariant"
+    },
+    {
+      "kind": "readout",
+      "id": "minting.contrast",
+      "title": "gyrator vs minted bit",
+      "data": {
+        "affinity": {
+          "value": 21.7656,
+          "values": [
+            0.0,
+            2.1766,
+            6.5297,
+            13.0594,
+            21.7656
+          ],
+          "over": [
+            "drive"
+          ],
+          "unit": "nats/cycle",
+          "verdict": "analytic",
+          "role": "primary",
+          "label": "\ud835\udc9c (3-cycle)"
+        },
+        "n2_sigma": {
+          "value": 0.0,
+          "unit": "nats/time",
+          "verdict": "analytic",
+          "role": "primary",
+          "label": "\u27e8\u03c3\u27e9 N=2 (gyrator)"
+        },
+        "n3_sigma": {
+          "value": 6.0,
+          "unit": "nats/time",
+          "verdict": "analytic",
+          "role": "primary",
+          "label": "\u27e8\u03c3\u27e9 N=3 (minted)"
+        },
+        "n2_minted_bit": {
+          "value": false,
+          "verdict": "analytic",
+          "role": "primary",
+          "label": "N=2 mints a bit?"
+        },
+        "n3_minted_bit": {
+          "value": true,
+          "verdict": "analytic",
+          "role": "primary",
+          "label": "N=3 mints a bit?"
+        }
+      },
+      "explain": "N=2 carries a current but no topological bit; N=3 is the minimal minted bit"
+    },
+    {
+      "kind": "series",
+      "id": "drive.relax",
+      "title": "is it stored, or kept up?",
+      "data": {
+        "x": [
+          0.0,
+          0.08,
+          0.16,
+          0.24,
+          0.32,
+          0.4,
+          0.48,
+          0.56,
+          0.64,
+          0.72,
+          0.8,
+          0.88,
+          0.96,
+          1.04,
+          1.12,
+          1.2,
+          1.28,
+          1.36,
+          1.44,
+          1.52,
+          1.6,
+          1.68,
+          1.76,
+          1.84,
+          1.92,
+          2.0,
+          2.08,
+          2.16,
+          2.24,
+          2.32,
+          2.4,
+          2.48,
+          2.56,
+          2.64,
+          2.72,
+          2.8,
+          2.88,
+          2.96,
+          3.04,
+          3.12,
+          3.2,
+          3.28,
+          3.36,
+          3.44,
+          3.52,
+          3.6,
+          3.68,
+          3.76,
+          3.84,
+          3.92,
+          4.0,
+          4.08,
+          4.16,
+          4.24,
+          4.32,
+          4.4,
+          4.48,
+          4.56,
+          4.64,
+          4.72,
+          4.8,
+          4.88,
+          4.96,
+          5.04,
+          5.12,
+          5.2,
+          5.28,
+          5.36,
+          5.44,
+          5.52,
+          5.6,
+          5.68,
+          5.76,
+          5.84,
+          5.92,
+          6.0,
+          6.08,
+          6.16,
+          6.24,
+          6.32,
+          6.4,
+          6.48,
+          6.56,
+          6.64,
+          6.72,
+          6.8,
+          6.88,
+          6.96,
+          7.04,
+          7.12,
+          7.2,
+          7.28,
+          7.36,
+          7.44,
+          7.52,
+          7.6,
+          7.68,
+          7.76,
+          7.84,
+          7.92
+        ],
+        "x_label": "time",
+        "traces": [
+          {
+            "name": "|J| (current)",
+            "y": [
+              0.01367,
+              0.01401,
+              0.01379,
+              0.0142,
+              0.01409,
+              0.01447,
+              0.01429,
+              0.0141,
+              0.01416,
+              0.01365,
+              0.014,
+              0.01423,
+              0.01402,
+              0.01377,
+              0.01394,
+              0.01413,
+              0.01404,
+              0.01393,
+              0.01433,
+              0.01419,
+              0.01414,
+              0.01417,
+              0.01373,
+              0.01387,
+              0.01395,
+              0.01369,
+              0.01388,
+              0.0138,
+              0.01368,
+              0.01391,
+              0.01389,
+              0.01437,
+              0.01391,
+              0.01394,
+              0.01417,
+              0.01416,
+              0.01398,
+              0.01397,
+              0.01359,
+              0.01207,
+              0.01092,
+              0.00983,
+              0.00883,
+              0.00815,
+              0.00729,
+              0.00668,
+              0.00603,
+              0.00528,
+              0.00484,
+              0.00453,
+              0.004,
+              0.0036,
+              0.00325,
+              0.00295,
+              0.00267,
+              0.00246,
+              0.00221,
+              0.002,
+              0.00181,
+              0.00165,
+              0.00149,
+              0.00135,
+              0.00123,
+              0.00113,
+              0.00101,
+              0.0009,
+              0.0008,
+              0.00072,
+              0.00066,
+              0.0006,
+              0.00055,
+              0.00049,
+              0.00044,
+              0.0004,
+              0.00037,
+              0.00034,
+              0.0003,
+              0.00027,
+              0.00025,
+              0.00023,
+              0.0002,
+              0.00018,
+              0.00016,
+              0.00015,
+              0.00013,
+              0.00012,
+              0.00011,
+              0.0001,
+              9e-05,
+              8e-05,
+              7e-05,
+              7e-05,
+              6e-05,
+              6e-05,
+              5e-05,
+              5e-05,
+              4e-05,
+              4e-05,
+              3e-05,
+              3e-05
+            ]
+          },
+          {
+            "name": "g (drive)",
+            "y": [
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.8,
+              0.761,
+              0.6886,
+              0.623,
+              0.5638,
+              0.5101,
+              0.4616,
+              0.4176,
+              0.3779,
+              0.3419,
+              0.3094,
+              0.28,
+              0.2533,
+              0.2292,
+              0.2074,
+              0.1877,
+              0.1698,
+              0.1536,
+              0.139,
+              0.1258,
+              0.1138,
+              0.103,
+              0.0932,
+              0.0843,
+              0.0763,
+              0.069,
+              0.0625,
+              0.0565,
+              0.0511,
+              0.0463,
+              0.0419,
+              0.0379,
+              0.0343,
+              0.031,
+              0.0281,
+              0.0254,
+              0.023,
+              0.0208,
+              0.0188,
+              0.017,
+              0.0154,
+              0.0139,
+              0.0126,
+              0.0114,
+              0.0103,
+              0.0093,
+              0.0085,
+              0.0076,
+              0.0069,
+              0.0063,
+              0.0057,
+              0.0051,
+              0.0046,
+              0.0042,
+              0.0038,
+              0.0034,
+              0.0031,
+              0.0028,
+              0.0025,
+              0.0023,
+              0.0021,
+              0.0019,
+              0.0017
+            ]
+          }
+        ],
+        "markers": [
+          {
+            "x": 3.0,
+            "label": "drive ramp starts"
+          }
+        ],
+        "J_driven": {
+          "value": -0.014,
+          "verdict": "analytic",
+          "role": "primary",
+          "label": "J while driven"
+        },
+        "J_final": {
+          "value": -6e-05,
+          "verdict": "analytic",
+          "role": "primary",
+          "label": "J after drive off"
+        }
+      },
+      "explain": "J(t) is the current; g(t) is the drive. Remove the drive and the current follows it to zero."
+    },
+    {
+      "kind": "readout",
+      "id": "ledgers.sigma",
+      "title": "one dissipation, two ledgers",
+      "data": {
+        "sigma_heat": {
+          "value": 4.006,
+          "unit": "nats/time",
+          "verdict": "analytic",
+          "role": "primary",
+          "label": "\u27e8\u03c3\u27e9 (heat ledger)"
+        },
+        "sigma_current": {
+          "value": 4.0062,
+          "unit": "nats/time",
+          "verdict": "analytic",
+          "role": "primary",
+          "label": "J\u00b7\ud835\udc9c (current ledger)"
+        },
+        "sigma_mc": {
+          "value": 3.954628469571924,
+          "unit": "nats/time",
+          "verdict": "converged",
+          "role": "primary",
+          "label": "\u27e8\u03c3\u27e9 (MC, Sekimoto heat)"
+        },
+        "heat_per_bath": {
+          "value": [
+            -1.2462,
+            -1.1217,
+            -1.2321
+          ],
+          "verdict": "analytic",
+          "role": "primary",
+          "label": "heat per bath"
+        }
+      },
+      "explain": "the heat ledger and the current ledger read the SAME \u03c3 (J\u00b7\ud835\udc9c = \u222bFDR departure)"
+    },
+    {
+      "kind": "locus",
+      "id": "ledgers.fdr",
+      "title": "fluctuation vs response (FDR) \u2014 calibration",
+      "data": {
+        "points": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            1.0911,
+            0.9918
+          ],
+          [
+            1.2925,
+            1.1095
+          ],
+          [
+            1.4052,
+            1.1402
+          ],
+          [
+            1.6851,
+            1.3478
+          ],
+          [
+            1.7818,
+            1.3767
+          ],
+          [
+            1.9388,
+            1.4708
+          ],
+          [
+            2.0579,
+            1.5314
+          ],
+          [
+            2.1655,
+            1.584
+          ],
+          [
+            2.2699,
+            1.6369
+          ],
+          [
+            2.3615,
+            1.6799
+          ],
+          [
+            2.4488,
+            1.7215
+          ],
+          [
+            2.5296,
+            1.7588
+          ],
+          [
+            2.6052,
+            1.7933
+          ],
+          [
+            2.6765,
+            1.8255
+          ],
+          [
+            2.7436,
+            1.8553
+          ],
+          [
+            2.8071,
+            1.8833
+          ],
+          [
+            2.8674,
+            1.9095
+          ],
+          [
+            2.9246,
+            1.9342
+          ],
+          [
+            2.9791,
+            1.9575
+          ],
+          [
+            3.031,
+            1.9795
+          ],
+          [
+            3.0807,
+            2.0004
+          ],
+          [
+            3.1283,
+            2.0202
+          ],
+          [
+            3.1738,
+            2.0391
+          ],
+          [
+            3.2176,
+            2.0571
+          ],
+          [
+            3.2597,
+            2.0744
+          ],
+          [
+            3.3002,
+            2.0908
+          ],
+          [
+            3.3392,
+            2.1066
+          ],
+          [
+            3.3768,
+            2.1218
+          ],
+          [
+            3.4132,
+            2.1363
+          ],
+          [
+            3.4483,
+            2.1503
+          ],
+          [
+            3.4823,
+            2.1638
+          ],
+          [
+            3.5152,
+            2.1768
+          ],
+          [
+            3.5471,
+            2.1894
+          ],
+          [
+            3.578,
+            2.2015
+          ],
+          [
+            3.608,
+            2.2132
+          ],
+          [
+            3.6371,
+            2.2246
+          ],
+          [
+            3.6654,
+            2.2356
+          ],
+          [
+            3.6929,
+            2.2462
+          ],
+          [
+            3.7197,
+            2.2566
+          ],
+          [
+            3.7458,
+            2.2666
+          ],
+          [
+            3.7712,
+            2.2764
+          ]
+        ],
+        "x_label": "C(0)\u2212C(t,tw)",
+        "y_label": "\u03c7(t,tw)",
+        "X_eq": {
+          "value": 1.0,
+          "verdict": "analytic",
+          "role": "reference",
+          "label": "X (equilibrium self-check \u22481)"
+        },
+        "X_aging": {
+          "value": 0.394,
+          "verdict": "analytic",
+          "role": "primary",
+          "label": "X (aging branch <1)"
+        },
+        "T_eff": {
+          "value": 2.54,
+          "verdict": "analytic",
+          "role": "primary",
+          "label": "T_eff = T/X"
+        },
+        "beta_imposed": {
+          "value": 0.5,
+          "verdict": "analytic",
+          "role": "reference",
+          "label": "\u03b2 imposed (by hand)"
+        },
+        "alpha_s": {
+          "value": 0.4832425360294457,
+          "verdict": "converged",
+          "role": "primary",
+          "label": "\u03b1_s (recovered aging slope)"
+        }
+      },
+      "explain": "slope 1 is equilibrium (X=1); a shallower aging branch is the FDR violation X<1. \u03b1_s recovers the imposed memory exponent \u03b2 \u2014 this is estimator calibration, not a test"
+    },
+    {
+      "kind": "sweep",
+      "id": "boundary.eps",
+      "title": "what's at the extreme?",
+      "data": {
+        "x": [
+          0.5,
+          0.8,
+          0.9,
+          0.95,
+          0.99
+        ],
+        "x_label": "\u03b5 (compression toward the marginal point)",
+        "gap": {
+          "values": [
+            2.5,
+            1.0,
+            0.5,
+            0.25,
+            0.05
+          ],
+          "over": [
+            "toward_edge"
+          ],
+          "verdict": "analytic",
+          "role": "primary",
+          "label": "spectral gap (\u21920)"
+        },
+        "cost": {
+          "values": [
+            2.0,
+            5.0,
+            10.0,
+            20.0,
+            100.0
+          ],
+          "over": [
+            "toward_edge"
+          ],
+          "verdict": "analytic",
+          "role": "primary",
+          "label": "1/(1\u2212\u03b5) cost (\u2192\u221e)"
+        },
+        "at_edge": {
+          "value": null,
+          "verdict": "boundary_tripwire",
+          "role": "primary",
+          "label": "observable AT \u03b5 = 1 (the edge)"
+        },
+        "boundary": {
+          "at": 1.0,
+          "label": "\u03b5 = 1 (never evaluated; the open-interval wall)"
+        }
+      },
+      "explain": "approaching \u03b5=1 the timescale gap closes and the cost diverges \u2014 but you can never read a value AT the edge"
+    },
+    {
+      "kind": "hierarchy",
+      "id": "cascade.tower",
+      "title": "how does complexity stack?",
+      "data": {
+        "levels": [
+          {
+            "k": 0,
+            "rate": 5.0,
+            "eps": 0.45,
+            "sigma": 0.768,
+            "role": "hidden"
+          },
+          {
+            "k": 1,
+            "rate": 2.25,
+            "eps": 0.45,
+            "sigma": 1.7067,
+            "role": "hidden"
+          },
+          {
+            "k": 2,
+            "rate": 1.013,
+            "eps": 0.45,
+            "sigma": 3.7926,
+            "role": "hidden"
+          },
+          {
+            "k": 3,
+            "rate": 0.456,
+            "sigma": 8.428,
+            "role": "resolved"
+          }
+        ],
+        "eps": [
+          0.45,
+          0.45,
+          0.45
+        ],
+        "sigma_total": {
+          "value": 14.6952,
+          "unit": "nats/time",
+          "verdict": "analytic",
+          "role": "primary",
+          "label": "\u03c3_total"
+        },
+        "sigma_resolved": {
+          "value": 8.428,
+          "unit": "nats/time",
+          "verdict": "analytic",
+          "role": "primary",
+          "label": "\u03c3_resolved (coarse)"
+        },
+        "sigma_hidden": {
+          "value": [
+            0.768,
+            1.7067,
+            3.7926
+          ],
+          "verdict": "analytic",
+          "role": "primary",
+          "label": "\u03c3_hidden per level (\u22650)"
+        },
+        "usable_depth": {
+          "value": 4,
+          "verdict": "analytic",
+          "role": "primary",
+          "label": "usable depth (before \u03b5\u21921 caps it)"
+        },
+        "ledger_holds": {
+          "value": true,
+          "verdict": "analytic",
+          "role": "primary",
+          "label": "\u03c3_total = \u03a3\u03c3_hidden + \u03c3_resolved, \u03c3_hidden\u22650"
+        }
+      },
+      "explain": "each level's minted circulation is paid for as hidden dissipation below; the ledger climbs"
+    }
+  ],
+  "provenance": {
+    "source": "character",
+    "seed": 20260610,
+    "refine_factor": 2,
+    "generated_at": "<inject-at-boundary>"
+  },
+  "schema": "scene/v0.1"
+}
