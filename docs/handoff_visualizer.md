@@ -98,36 +98,48 @@ that growth is cheap.
   never crashes. Pin the major schema version; tolerate unknown minors. Evolution stays additive;
   an old renderer degrades gracefully against a newer scene.
 
-## 3b. τ_obs is the camera (not a slider)
+## 3b. Camera modes — standard (default) and τ_obs
 
-The framework's deepest claim is that *the character you see depends on the scale you observe at* —
-there is no scale-free view; the observer's scale is part of the physics. So the primary camera is
-not a spatial position, it is **τ_obs, the observation scale** (the level in the coarse-graining /
-RG flow). The contract carries this as an **observer axis** (`Axis.kind == "observer"`, e.g.
-`tau_obs`) — pre-swept like a value axis, but the visualizer binds it to **camera navigation**, not
-a generic slider.
+The viewport has **two camera modes**; the learner toggles between them. Default to standard — do
+not force the unfamiliar scale-camera on someone still orienting (the anti-give-up reasoning again).
 
-- **Bind the camera to it (Mode B).** Moving through scale *is* dollying the camera: fine (small
-  τ_obs) → microscopic detail, the fast circulation fully resolved; coarse (large τ_obs) → the
-  detail is absorbed into hidden dissipation, only the slow structure survives; the **marginal
-  point** (`boundary.at`) is a horizon where coarse-graining fails (ε→1) — render it as a wall in
-  scale you cannot pass. "The viewer rides the RG flow."
-- **`|Δτ_obs|` is the LOD metric.** An element's distance from the camera's current τ_obs sets its
-  detail: near-scale = sharp/instanced, far-scale = aggregated/faded. This is what makes 10⁴-node
-  scenes legible — you only resolve what's near your observation scale. (Two distances coexist: the
-  ordinary graphics depth, and this *framework* distance in scale.)
-- **Offer both modes.** *Mode A* lays the τ_obs axis out as a world axis (see the whole
-  scale-ladder from outside — good for orientation); *Mode B* makes the graphics camera ≡ τ_obs
-  (ride it — good for immersion). Default to A to orient, let the learner dive into B.
-- **The global vision.** τ_obs is *the* camera across the whole scene: every view/element lives at
-  a τ_obs, and one camera frames them all. The `observe` exploration establishes the mechanism;
-  as the scene grows, give each element a τ_obs coordinate so the one camera frames everything.
+**Standard mode (default).** A conventional 3-D viewport camera: **tumble** (orbit a pivot/target),
+**pan** (translate the pivot), **dolly/zoom** (along the view axis), plus *frame-selected*. This is
+the comfortable, expected way to inspect geometry — orbit the coupling graph, the cascade tower,
+the fields, from any angle. In standard mode τ_obs is a *separate scrubber* (the observer axis
+still appears as a control) and the `|Δτ_obs|` LOD follows it: you orbit freely **and** choose your
+observation scale independently.
+
+**τ_obs mode (the option).** The camera *couples to the observation-scale axis* — its primary
+motion is dollying *through scale* (the `observer` axis IS the camera). Fine → microscopic detail,
+the fast circulation fully resolved; coarse → detail absorbed into hidden dissipation, only the
+slow structure survives; the **marginal point** (`boundary.at`) is a horizon where coarse-graining
+fails (ε→1) — a wall in scale you cannot pass. "Ride the RG flow." Tumble is constrained here (keep
+the scale axis oriented); the depth you move through is *scale*, not space.
+
+**How they coexist — one scene, two camera behaviors.** Lay τ_obs out as a **world axis** (Mode A):
+the scene's elements sit at their τ_obs along it, so the whole scale-ladder is real geometry.
+Standard mode then *orbits* that laid-out scene; τ_obs mode *glides the camera along* the scale axis
+(Mode B). Switching is a camera-behavior change, **not** a scene rebuild — smooth. Surface τ_obs
+mode especially in the `observe` exploration (its guided step is literally "this knob is the
+camera").
+
+- **`|Δτ_obs|` LOD (both modes).** An element's distance from the *current* τ_obs (the scrubber in
+  standard mode, the camera position in τ_obs mode) sets its detail: near-scale = sharp/instanced,
+  far-scale = aggregated/faded. This is what keeps 10⁴-node scenes legible. Two distances coexist:
+  ordinary graphics depth, and this *framework* distance in scale.
+- **The contract piece that unifies them** is a **per-element τ_obs coordinate** (where each element
+  sits on the scale axis), composed with the view's intrinsic layout into the 3-D scene. The
+  `observer` axis (shipped) is the camera's *traversal*; the per-element τ_obs coords (a flagged
+  growth item) are the *world-axis layout* that lets standard-mode tumble show the scale ladder.
+  Add them when you build the 3-D scene; until then, standard tumble works fine over the per-view
+  2-D layouts lifted into space.
 - **Compressed for teaching, not simulated.** The source emits representative coarse-grainings at
-  sampled scales (real per-level dissipation, but not a live RG integration). It is a learning
-  tool: the τ_obs ladder is clean and navigable, the marginal point is a dramatized horizon.
+  sampled scales (real per-level dissipation, not a live RG integration). The τ_obs ladder is clean
+  and navigable; the marginal point is a dramatized horizon.
 
-At most one observer axis per scene — it is the camera. (The contract's `validate()` enforces this
-and that the observer axis is actually swept.)
+At most one observer axis per scene — it is the (τ_obs-mode) camera. The contract's `validate()`
+enforces this and that the observer axis is actually swept.
 
 ## 4. Progressive rendering (what it means here)
 
