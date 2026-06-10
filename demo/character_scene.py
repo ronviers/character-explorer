@@ -247,6 +247,26 @@ def act_boundary(kf=5.0):
     return dict(eps_vals=eps_vals, gap=gap, heavy_traffic=heavy_traffic, at_edge=at_edge)
 
 
+def act_observe(n_levels=11, kappa0=8.0, spread=0.55, g=0.8, D=0.05, marginal_eps=0.9):
+    """τ_obs as the CAMERA: ride the observation scale (the level in the coarse-graining / RG flow).
+    At each scale the cascade ledger reads differently — fine scales resolve the fast circulation,
+    coarse scales absorb it into hidden dissipation — until the marginal point (ε→1) where the slow
+    manifold fails. Compressed for teaching: representative coarse-grainings at sampled scales, real
+    per-level EP (ness_ep), but NOT a live RG integration. τ_obs is orthogonal to drive (the
+    substrate's state) and to depth (how tall the tower is): it is WHERE you observe from."""
+    rates = [kappa0 / (1.0 + spread * k) for k in range(n_levels)]      # crowd together toward coarse
+    tau = [round(1.0 / r, 3) for r in rates]                            # τ_obs = 1/rate (coarse = large)
+    sig = [float(ness_ep(cycle_drift(3, r, g), D * np.eye(3))[0]) for r in rates]
+    tot = float(sum(sig))
+    resolved = [round(sum(sig[k:]), 4) for k in range(n_levels)]        # levels ≥ k are slow -> resolved
+    hidden = [round(sum(sig[:k]), 4) for k in range(n_levels)]          # levels < k are fast -> hidden
+    frac = [round(sum(sig[k:]) / tot, 3) for k in range(n_levels)]
+    eps = [round(rates[k + 1] / rates[k], 3) for k in range(n_levels - 1)]   # → 1 toward coarse
+    marginal_tau = next((tau[k] for k in range(n_levels - 1) if eps[k] >= marginal_eps), None)
+    return dict(tau=tau, resolved=resolved, hidden=hidden, frac=frac, eps=eps,
+                sigma_total=round(tot, 4), marginal_tau=marginal_tau)
+
+
 # =====================================================================================
 #  EXPLORATIONS: each learner question -> (axes, views, guided step).  Guided is default.
 # =====================================================================================
@@ -360,11 +380,38 @@ def explore_cascade(P):
     return [ax], views, step
 
 
+def explore_observe(P):
+    o = act_observe()
+    # τ_obs is the CAMERA: an observer axis the visualizer binds to scale-navigation (Mode B),
+    # not a slider. Channels are swept over it; |Δτ_obs| drives level-of-detail.
+    ax = Axis(name="tau_obs", label="the scale you observe at (τ_obs — this is the camera)",
+              values=o["tau"], kind="observer")
+    views = [View(kind="sweep", id="observe.scale", title="the character you see depends on the scale you observe at",
+                  explain="ride the observation scale: fine scales resolve the fast circulation; coarse scales "
+                          "absorb it into hidden dissipation; the marginal point is the horizon where coarse-graining fails",
+                  data=dict(x=o["tau"], x_label="τ_obs  (fine ──▶ coarse)",
+                            resolved=exact(None, over=["tau_obs"], values=o["resolved"],
+                                           unit="nats/time", label="σ_resolved (what you can see at this scale)"),
+                            hidden=exact(None, over=["tau_obs"], values=o["hidden"],
+                                         unit="nats/time", label="σ_hidden (absorbed below this scale)"),
+                            resolved_fraction=exact(None, over=["tau_obs"], values=o["frac"],
+                                                    label="fraction of structure still resolved"),
+                            sigma_total=exact(o["sigma_total"], unit="nats/time", label="σ_total (scale-invariant)"),
+                            boundary=dict(at=o["marginal_tau"],
+                                          label="marginal point ε→1 — the horizon; coarse-graining fails beyond it")))]
+    step = GuidedStep(id="q6", title="What does the scale you look at decide?",
+                      prompt="This knob is the camera — your observation scale τ_obs. Fly it from fine to coarse: "
+                             "the fast circulation you could resolve gets absorbed into hidden dissipation, until the "
+                             "horizon (the marginal point) where the hierarchy stops converging. There is no scale-free view.",
+                      view="observe.scale", axis="tau_obs")
+    return [ax], views, step
+
+
 EXPLORATIONS = {
     "minting": explore_minting, "drive": explore_drive, "ledgers": explore_ledgers,
-    "boundary": explore_boundary, "cascade": explore_cascade,
+    "boundary": explore_boundary, "cascade": explore_cascade, "observe": explore_observe,
 }
-ORDER = ["minting", "drive", "ledgers", "boundary", "cascade"]
+ORDER = ["minting", "drive", "ledgers", "boundary", "cascade", "observe"]
 
 
 def assemble(explores, params, seed):

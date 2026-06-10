@@ -98,6 +98,37 @@ that growth is cheap.
   never crashes. Pin the major schema version; tolerate unknown minors. Evolution stays additive;
   an old renderer degrades gracefully against a newer scene.
 
+## 3b. τ_obs is the camera (not a slider)
+
+The framework's deepest claim is that *the character you see depends on the scale you observe at* —
+there is no scale-free view; the observer's scale is part of the physics. So the primary camera is
+not a spatial position, it is **τ_obs, the observation scale** (the level in the coarse-graining /
+RG flow). The contract carries this as an **observer axis** (`Axis.kind == "observer"`, e.g.
+`tau_obs`) — pre-swept like a value axis, but the visualizer binds it to **camera navigation**, not
+a generic slider.
+
+- **Bind the camera to it (Mode B).** Moving through scale *is* dollying the camera: fine (small
+  τ_obs) → microscopic detail, the fast circulation fully resolved; coarse (large τ_obs) → the
+  detail is absorbed into hidden dissipation, only the slow structure survives; the **marginal
+  point** (`boundary.at`) is a horizon where coarse-graining fails (ε→1) — render it as a wall in
+  scale you cannot pass. "The viewer rides the RG flow."
+- **`|Δτ_obs|` is the LOD metric.** An element's distance from the camera's current τ_obs sets its
+  detail: near-scale = sharp/instanced, far-scale = aggregated/faded. This is what makes 10⁴-node
+  scenes legible — you only resolve what's near your observation scale. (Two distances coexist: the
+  ordinary graphics depth, and this *framework* distance in scale.)
+- **Offer both modes.** *Mode A* lays the τ_obs axis out as a world axis (see the whole
+  scale-ladder from outside — good for orientation); *Mode B* makes the graphics camera ≡ τ_obs
+  (ride it — good for immersion). Default to A to orient, let the learner dive into B.
+- **The global vision.** τ_obs is *the* camera across the whole scene: every view/element lives at
+  a τ_obs, and one camera frames them all. The `observe` exploration establishes the mechanism;
+  as the scene grows, give each element a τ_obs coordinate so the one camera frames everything.
+- **Compressed for teaching, not simulated.** The source emits representative coarse-grainings at
+  sampled scales (real per-level dissipation, but not a live RG integration). It is a learning
+  tool: the τ_obs ladder is clean and navigable, the marginal point is a dramatized horizon.
+
+At most one observer axis per scene — it is the camera. (The contract's `validate()` enforces this
+and that the observer axis is actually swept.)
+
 ## 4. Progressive rendering (what it means here)
 
 Two layers, both "coarse first, then refine":

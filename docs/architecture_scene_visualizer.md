@@ -122,6 +122,14 @@ hand them to the learner as labelled, consequence-bearing knobs.
 Cross-products are allowed but cost precompute; the source caps total samples and `log()`s what it
 dropped, never silently truncating a sweep.)
 
+Three axis **kinds** (`Axis.kind`): **value** (pre-swept; scrub = index = a uniform update over
+resident geometry), **structural** (changes geometry/topology — node count, cascade depth — so
+scrub triggers a recompute / re-invoke), and **observer** (the observation-scale coordinate
+`τ_obs`; pre-swept like value, but the visualizer binds it to the **camera** and uses `|Δτ_obs|`
+for level-of-detail — see [`handoff_visualizer.md`](handoff_visualizer.md) §3b). Exactly one
+observer axis per scene; it is the camera. `validate()` rejects a value/observer axis that nothing
+is swept over (the conflation that hides a recompute behind a fake scrubber).
+
 ---
 
 ## 4. The convergence gate — general, in `Channel.verdict`

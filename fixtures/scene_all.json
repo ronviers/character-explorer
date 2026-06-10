@@ -53,6 +53,13 @@
         "prompt": "Add levels. Structure climbs the protected subspace; its cost is paid downward as hidden dissipation. Past \u03b5\u21921 the tower stops converging.",
         "view": "cascade.tower",
         "axis": "depth"
+      },
+      {
+        "id": "q6",
+        "title": "What does the scale you look at decide?",
+        "prompt": "This knob is the camera \u2014 your observation scale \u03c4_obs. Fly it from fine to coarse: the fast circulation you could resolve gets absorbed into hidden dissipation, until the horizon (the marginal point) where the hierarchy stops converging. There is no scale-free view.",
+        "view": "observe.scale",
+        "axis": "tau_obs"
       }
     ]
   },
@@ -91,6 +98,24 @@
         4
       ],
       "kind": "structural"
+    },
+    {
+      "name": "tau_obs",
+      "label": "the scale you observe at (\u03c4_obs \u2014 this is the camera)",
+      "values": [
+        0.125,
+        0.194,
+        0.263,
+        0.331,
+        0.4,
+        0.469,
+        0.538,
+        0.606,
+        0.675,
+        0.744,
+        0.812
+      ],
+      "kind": "observer"
     }
   ],
   "views": [
@@ -967,6 +992,104 @@
         }
       },
       "explain": "each level's minted circulation is paid for as hidden dissipation below; the ledger climbs"
+    },
+    {
+      "kind": "sweep",
+      "id": "observe.scale",
+      "title": "the character you see depends on the scale you observe at",
+      "data": {
+        "x": [
+          0.125,
+          0.194,
+          0.263,
+          0.331,
+          0.4,
+          0.469,
+          0.538,
+          0.606,
+          0.675,
+          0.744,
+          0.812
+        ],
+        "x_label": "\u03c4_obs  (fine \u2500\u2500\u25b6 coarse)",
+        "resolved": {
+          "values": [
+            19.8,
+            19.32,
+            18.576,
+            17.568,
+            16.296,
+            14.76,
+            12.96,
+            10.896,
+            8.568,
+            5.976,
+            3.12
+          ],
+          "over": [
+            "tau_obs"
+          ],
+          "unit": "nats/time",
+          "verdict": "analytic",
+          "role": "primary",
+          "label": "\u03c3_resolved (what you can see at this scale)"
+        },
+        "hidden": {
+          "values": [
+            0,
+            0.48,
+            1.224,
+            2.232,
+            3.504,
+            5.04,
+            6.84,
+            8.904,
+            11.232,
+            13.824,
+            16.68
+          ],
+          "over": [
+            "tau_obs"
+          ],
+          "unit": "nats/time",
+          "verdict": "analytic",
+          "role": "primary",
+          "label": "\u03c3_hidden (absorbed below this scale)"
+        },
+        "resolved_fraction": {
+          "values": [
+            1.0,
+            0.976,
+            0.938,
+            0.887,
+            0.823,
+            0.745,
+            0.655,
+            0.55,
+            0.433,
+            0.302,
+            0.158
+          ],
+          "over": [
+            "tau_obs"
+          ],
+          "verdict": "analytic",
+          "role": "primary",
+          "label": "fraction of structure still resolved"
+        },
+        "sigma_total": {
+          "value": 19.8,
+          "unit": "nats/time",
+          "verdict": "analytic",
+          "role": "primary",
+          "label": "\u03c3_total (scale-invariant)"
+        },
+        "boundary": {
+          "at": 0.675,
+          "label": "marginal point \u03b5\u21921 \u2014 the horizon; coarse-graining fails beyond it"
+        }
+      },
+      "explain": "ride the observation scale: fine scales resolve the fast circulation; coarse scales absorb it into hidden dissipation; the marginal point is the horizon where coarse-graining fails"
     }
   ],
   "provenance": {
