@@ -45,26 +45,58 @@ Key distinction that keeps it fast:
 A thin local bridge runs the CLI on demand (see stack options). The dashboard never imports the
 physics; it shells out and reads JSON.
 
-## 3. Recommended stack
+## 3. The stack (decided — optimize for growth, not current load)
 
-**Recommendation: a web dashboard + WebGPU renderer + a thin Python bridge.**
-- *Dashboard / controls* — web UI (your choice of vanilla/Svelte/React). Dashboards are strongest
-  in the browser; sliders, toggles, and a guided-tour overlay are native there.
-- *GPU progressive rendering* — **WebGPU** (WebGL2/regl/Three.js as a fallback). The 2026-modern
-  GPU path; integrates with a web dashboard with no native build.
-- *Bridge* — a ~30-line local server (FastAPI/Flask) exposing `POST /scene` that runs
-  `character_scene.py --explore … --emit` and returns the JSON. Keeps the dashboard physics-free.
+The compute→scene→render split already lets compute and rendering scale independently. The
+renderer is the one subsystem expected to grow 10×+ (graph size, fields, refinement), so it gets a
+real engine; everything else stays thin.
 
-Rationale: matches the browser-viewer precedent in this program, keeps the contract (already JSON)
-as the only coupling, and lets the renderer be developed offline against the fixture first.
+| layer | choice |
+|---|---|
+| UI / controls | React or Svelte — sliders, toggles, the guided-tour overlay |
+| scene model | **TypeScript**, mirroring `scene_contract.py`'s dataclasses 1:1 |
+| renderer | **WebGPU** — GPU-resident geometry, uniform-driven interaction, accumulation for progressive refinement |
+| bridge | **FastAPI** — ~30 lines, `POST /scene` runs `character_scene.py … --emit` and returns JSON |
+| compute | the Python CLI, **entirely outside the visualization process** |
 
-**Alternatives** (pick if you prefer native/single-language):
-- *Taichi (GGUI + GPU)* — consistent with the program's existing Taichi rendering pipeline; GPU
-  compute is first-class. Weaker for rich dashboard widgets; good if the visuals dominate.
-- *PyQt/PySide + moderngl* (or `pyqtgraph`) — strong native dashboard widgets + GPU; desktop-only,
-  heavier dependency. Single Python process can drive the CLI in-process.
+WebGPU from day one — not WebGL-then-port. On this hardware it drives the GPU as fully as any
+native path (browser → D3D12/Vulkan), so there is no GPU-utilization reason to go native.
 
-This is **decision #1 for your session.** The contract is stack-agnostic either way.
+**Not Taichi.** Taichi earns its keep when the renderer *is* the simulation. This architecture
+forbids that — the renderer runs no physics, the simulation already happened, you are visualizing
+vetted outputs. That single rule removes Taichi's reason to exist here. (PyQt + moderngl is a
+viable native fallback only if a browser is ever off the table; it is not the default.)
+
+## 3a. Designing for 10× growth
+
+The project is research-oriented: graph size will go 10²→10⁴, scalars will become *fields*
+(circulation, uncertainty, flow), and a new `view kind` will appear every few months. Build so
+that growth is cheap.
+
+- **GPU-resident geometry; interaction is uniforms — for *value* axes.** Upload nodes / edges /
+  positions once; scrubbing `drive` / `time` / `toward_edge` updates *uniforms*, not meshes — no
+  DOM churn, no chart rebuild. **Caveat:** *structural* axes (`n_nodes` 2→3, `cascade_depth` 1→d)
+  change the geometry itself → re-upload, or pre-load all variants and switch. Design for two
+  classes of axis: value-axes = uniforms, structural-axes = geometry. Don't assume geometry is
+  immutable.
+- **Composable primitives — not a widget zoo, and not a speculative engine.** One failure mode is
+  a custom widget per view kind; the opposite is a generic scene-graph + shader-compiler you build
+  for view kinds that don't exist yet. Sit in the middle: a small library of GPU **primitives** —
+  instanced points, instanced lines, line-strips, a **field/texture pass**, a text/annotation
+  layer — that view kinds *compose*. `graph` = points + lines + labels; a future
+  `protection_landscape` = field pass + contour lines. A new view kind is a new *composition +
+  data binding*, not a new shader and not a new widget. (Grammar-of-graphics at the GPU level:
+  most "new views" are recombinations of marks + fields + annotations.)
+- **Progressive refinement is end-to-end, not a render trick.** The first wall is *compute*, not
+  the GPU. A monolithic scene emit — *doubled by the gate's base + refine×* — is what balloons at
+  10⁴ nodes / deep cascades / fine sweeps, long before the 4080 sweats. So the contract should grow
+  to **stream**: static geometry first (instant preview) → coarse channels → refined channels.
+  "Low fidelity first, then refine" then runs from compute to pixel, one accumulation buffer
+  serving both. This is a `scene/v0.x` evolution (partial / patch scenes) and it matters more than
+  any renderer choice. **Likely the first thing you'll actually need.**
+- **Forward-compatible by default.** A renderer **skips unknown view kinds** (and surfaces them),
+  never crashes. Pin the major schema version; tolerate unknown minors. Evolution stays additive;
+  an old renderer degrades gracefully against a newer scene.
 
 ## 4. Progressive rendering (what it means here)
 
@@ -74,7 +106,9 @@ Two layers, both "coarse first, then refine":
   4K target, 2K minimum once settled). Natural in WebGPU via accumulate-over-frames.
 - **Data** — the demo's convergence gate has a `--refine`-style knob (base vs refine× resolution).
   A "sharpen" action can re-invoke the CLI at higher refinement; channels whose `verdict` was
-  borderline tighten. Show the verdict changing as it sharpens.
+  borderline tighten. Show the verdict changing as it sharpens. At scale this becomes the
+  **streaming** path in §3a (geometry → coarse channels → refined channels), so the same coarse→
+  fine motion runs end-to-end, compute through pixel.
 
 ## 5. View → visual mapping
 
@@ -87,6 +121,7 @@ Two layers, both "coarse first, then refine":
 | `hierarchy` | `levels[]{k,rate,eps,sigma,role}`, totals | a stacked tower; per-level σ; up-climb / down-cost arrows; mark the ε→1 cutoff |
 | `sweep` | `x`, channels over the axis, a `boundary{at,label}` | curve(s) vs the control; render the `boundary` marker as an unreachable wall |
 | `readout` | named scalar channels with `unit`, `verdict` | a panel of labelled numbers; style by verdict (below) |
+| `field` *(planned, scene/v0.2)* | a sampled grid / texture-backed channel (circulation as a vector field, an uncertainty field) | the field/texture pass — GPU-native; the reason to include a field primitive from day one |
 
 ## 6. Honor the verdict (non-negotiable, and general)
 
@@ -123,8 +158,12 @@ test" lines) — it must not be dismissable away to nothing.
 
 ## 9. Open decisions for your session
 
-1. **Stack** — web+WebGPU+bridge (recommended) vs Taichi vs PyQt+moderngl.
-2. **Bridge transport** — local HTTP server, or a one-shot subprocess per recompute, or a
-   long-lived stdio worker. (HTTP is simplest; stdio is lowest-latency.)
-3. **Scene caching** — cache emitted scenes by `(explore set, depth, refine)` so re-selecting a
+Stack is decided (§3). What's left:
+1. **Bridge transport** — local HTTP server, or a one-shot subprocess per recompute, or a
+   long-lived stdio worker. (HTTP is simplest; stdio is lowest-latency; the streaming path in §3a
+   wants a persistent channel, so a long-lived stdio/websocket worker is the growth-friendly pick.)
+2. **Scene caching** — cache emitted scenes by `(explore set, depth, refine)` so re-selecting a
    prior configuration is instant.
+3. **When to add `field` + streaming** — not for the first cut (the discrete views + the fixture
+   are enough to get a working dashboard). Add them when graph size or field-shaped observables
+   actually arrive; build the primitive set so the field pass slots in without a rewrite.

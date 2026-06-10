@@ -87,9 +87,22 @@ indexed by scrubbable **Axes**. Nothing in this vocabulary mentions character.
 | `hierarchy` | ordered levels, per-level channels, inter-level flow channels, a cutoff marker | cascade: the tower, σ split, ε→1 cutoff | trophic levels; a multigrid stack |
 | `sweep` | control x → observable y, regime bands, a "boundary approached" marker | the ε→1 / drive-lock sweeps | rate-constant → steady state |
 | `readout` | named scalar channels with units + verdicts | σ = J·𝒜, the heat per bath | any panel of computed numbers |
+| `field` *(planned, v0.2)* | a sampled grid / texture-backed channel | circulation as a vector field; an uncertainty field | any continuous field (a density, a flow) |
 
 Each view binds its channels by name; the visualizer knows how to *draw a `graph` with a flow
 channel*, not what "minting" is. Labels and prompts come from the scene source via `meta`/`label`.
+
+**Growth note (the vocabulary is discrete today).** The kinds above are all discrete marks. As the
+project scales, scalars become *fields* (circulation → a vector field, gate verdicts → an
+uncertainty field) — hence the planned `field` kind and a texture-backed channel. Build the
+renderer's primitive set with a field/texture pass from the start so this is additive. Two
+companion contract evolutions travel with it: (1) **streaming / partial scenes** — emit static
+geometry first, then coarse channels, then refined channels, so progressive refinement runs
+end-to-end (compute→pixel), not just in the renderer; this is the answer to the first real wall,
+which is *scene-generation cost* (a monolithic emit, doubled by the gate's base+refine×), not
+rendering. (2) **forward-compatibility** — a renderer **skips unknown view kinds** and surfaces
+them rather than crashing; pin the major schema version, tolerate unknown minors, keep evolution
+additive.
 
 ---
 
@@ -183,9 +196,13 @@ Views/Channels/Axes. Console mode renders the same obs for humans; `--emit` writ
 
 Inherits a frozen brief, no live code:
 1. **Input:** any `scene/v0.1`. Knows nothing of character; pins the schema version.
-2. **Render the View vocabulary** (graph/series/locus/spectrum/hierarchy/sweep/readout). Adding a
-   new domain later is a new scene source, *not* a visualizer change.
+2. **Render the View vocabulary** (graph/series/locus/spectrum/hierarchy/sweep/readout) by
+   *composing GPU primitives* (marks + fields + annotations), not a widget per kind. Adding a new
+   domain — or a new view kind — is a new scene source / composition, *not* an engine rewrite. An
+   **unknown view kind is skipped and surfaced, never fatal.**
 3. **Expose Axes as controls**; scrubbing indexes precomputed channels. No physics, no recompute.
+   *Value*-axes update uniforms (geometry stays resident); *structural*-axes (node count, depth)
+   rebuild or switch geometry — see [`handoff_visualizer.md`](handoff_visualizer.md) §3a.
 4. **Honor `Channel.verdict`** (render fact / edge-state / refuse) — this is general, not per-domain.
 5. **Surface `meta.framing` and `meta.guided`** — disclaimers are first-class UI; guided prompts
    nudge the learner ("turn frustration off — where did the current go?").
