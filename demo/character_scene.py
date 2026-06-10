@@ -279,8 +279,9 @@ def explore_minting(P):
 
 
 def explore_drive(P):
+    # No scene-level axis here: time is the series view's OWN x-dimension (already carried by
+    # x/traces), not a parameter you sweep. The renderer offers a playhead over the series.
     o = act_relaxation()
-    ax = Axis(name="time", label="watch over time (drive ramps off)", values=o["t"])
     views = [View(kind="series", id="drive.relax", title="is it stored, or kept up?",
                   explain="J(t) is the current; g(t) is the drive. Remove the drive and the current follows it to zero.",
                   data=dict(x=o["t"], x_label="time",
@@ -290,9 +291,9 @@ def explore_drive(P):
                             J_driven=exact(o["J_driven"], label="J while driven"),
                             J_final=exact(o["J_final"], label="J after drive off")))]
     step = GuidedStep(id="q2", title="Stored or sustained?",
-                      prompt="Scrub time past the ramp. The current decays to ~0 — it was never stored, only sustained by the drive.",
-                      view="drive.relax", axis="time")
-    return [ax], views, step
+                      prompt="Play the series past the ramp. The current decays to ~0 — it was never stored, only sustained by the drive.",
+                      view="drive.relax")
+    return [], views, step
 
 
 def explore_ledgers(P):
@@ -341,7 +342,10 @@ def explore_boundary(P):
 def explore_cascade(P):
     depth = P["cascade_depth"]
     o = act_cascade(depth)
-    ax = Axis(name="depth", label="stack the hierarchy (cascade depth)", values=list(range(1, depth + 1)))
+    # depth changes the geometry (number of levels), not values over fixed geometry -> STRUCTURAL:
+    # scrubbing it re-invokes the source (--cascade-depth), it is not a pre-swept index.
+    ax = Axis(name="depth", label="stack the hierarchy (cascade depth)",
+              values=list(range(1, depth + 1)), kind="structural")
     views = [View(kind="hierarchy", id="cascade.tower", title="how does complexity stack?",
                   explain="each level's minted circulation is paid for as hidden dissipation below; the ledger climbs",
                   data=dict(levels=o["levels"], eps=o["eps"],

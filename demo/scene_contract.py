@@ -37,6 +37,13 @@ TRUSTWORTHY = {CONVERGED, ANALYTIC}   # the visualizer renders only these as fac
 VIEW_KINDS = {"graph", "series", "locus", "spectrum", "hierarchy", "sweep", "readout"}
 MODES = {"guided", "open"}
 
+# An axis is either VALUE (channels are pre-swept over it; scrubbing just indexes the arrays --
+# a renderer maps this to a uniform update over resident geometry) or STRUCTURAL (changing it
+# changes the geometry/topology -- node count, cascade depth -- so scrubbing triggers a RECOMPUTE,
+# i.e. re-invoking the source CLI; the geometry is rebuilt/switched, not indexed). Keeping these
+# distinct in the contract is what stops a consumer assuming "all axes are scrub-and-index".
+AXIS_KINDS = {"value", "structural"}
+
 
 @dataclass(frozen=True)
 class Channel:
@@ -54,10 +61,15 @@ class Channel:
 
 @dataclass(frozen=True)
 class Axis:
-    """A scrubbable, PRE-SWEPT parameter dimension. `values` are the sampled settings."""
+    """A learner-facing knob.  `kind` decides how a consumer treats it:
+    - "value"      : channels are PRE-SWEPT over `values`; scrubbing indexes them (uniform update).
+    - "structural" : `values` are settings that change geometry/topology (node count, depth);
+                     scrubbing triggers a RECOMPUTE (re-invoke the source), not an index.
+    `values` are the sampled settings either way."""
     name: str
     label: str                                # learner-facing question, e.g. "how hard is it driven?"
     values: list
+    kind: str = "value"                       # value | structural  (see AXIS_KINDS)
 
 
 @dataclass(frozen=True)
@@ -129,6 +141,7 @@ def validate(scene: Scene) -> list[str]:
         problems.append(f"schema {scene.schema!r} != {SCHEMA!r}")
     if scene.meta.mode_default not in MODES:
         problems.append(f"mode_default {scene.meta.mode_default!r} not in {MODES}")
+    swept = set()                                          # axes actually referenced by a channel
     for v in scene.views:
         if v.kind not in VIEW_KINDS:
             problems.append(f"view {v.id!r}: unknown kind {v.kind!r}")
@@ -136,10 +149,19 @@ def validate(scene: Scene) -> list[str]:
             if ch.verdict not in VERDICTS:
                 problems.append(f"view {v.id!r}: bad verdict {ch.verdict!r}")
             for ax in (ch.over or []):
+                swept.add(ax)
                 if ax not in axis_names:
                     problems.append(f"view {v.id!r}: channel over unknown axis {ax!r}")
             if ch.over and ch.values is None:
                 problems.append(f"view {v.id!r}: axis-indexed channel missing `values`")
+    for a in scene.axes:
+        if a.kind not in AXIS_KINDS:
+            problems.append(f"axis {a.name!r}: bad kind {a.kind!r} (not in {AXIS_KINDS})")
+        # a VALUE axis claims to be pre-swept; if nothing is indexed over it, that's a lie ->
+        # it is really a STRUCTURAL (recompute) axis. (Structural axes legitimately have none.)
+        if a.kind == "value" and a.name not in swept:
+            problems.append(f"axis {a.name!r}: kind=value but no channel is `over` it "
+                            f"(mark it structural, or sweep a channel over it)")
     for step in scene.meta.guided:
         if step.view not in view_ids:
             problems.append(f"guided step {step.id!r}: unknown view {step.view!r}")
